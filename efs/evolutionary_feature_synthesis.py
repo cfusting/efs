@@ -19,6 +19,8 @@ from efs.operator import default_operators
 
 REGRESSION = 'regression'
 CLASSIFICATION = 'classification'
+ZERO_OUT = 'zero_out'
+COEFFICIENT_RANK = 'coefficient_rank'
 
 
 def build_operation_stack(string):
@@ -95,10 +97,11 @@ def get_basis_from_infix_features(infix_features, feature_names, X, scaler=None,
 
 class EvolutionaryFeatureSynthesis:
 
-    def __init__(self, seed, fitness_algorithm, method=None, max_gens=10, num_additions=None, normalize=True,
-                 preserve_originals=True, tournament_probability=.9, max_useless_steps=10, fitness_threshold=.01,
-                 correlation_threshold=0.95, reinit_range_operators=3, splits=3, time_series_cv=False,
-                 range_operators=0, variable_type_indices=None, operators=default_operators, verbose=1):
+    def __init__(self, seed=random.randint(), fiteness_algorithm='', method=None, max_gens=10, num_additions=None,
+                 normalize=True, preserve_originals=True, tournament_probability=.9, max_useless_steps=10,
+                 fitness_threshold=.01, correlation_threshold=0.95, reinit_range_operators=3, splits=3,
+                 time_series_cv=False, range_operators=0, variable_type_indices=None, operators=default_operators,
+                 verbose=1):
         self.seed = seed
         self.fitness_algorithm = fitness_algorithm
         self.method = method
@@ -259,9 +262,9 @@ class EvolutionaryFeatureSynthesis:
     def _update_fitness(self, y):
         basis, _ = self._get_current_basis()
         model, coefs, mse_path = self._build_linear_model(basis, y)
-        if self.fitness_algorithm == 'zero_out':
+        if self.fitness_algorithm == ZERO_OUT:
             self._remove_zeroed_features(model)
-        elif self.fitness_algorithm == 'coefficient_rank':
+        elif self.fitness_algorithm == COEFFICIENT_RANK:
             self._rank_by_coefficient(coefs, mse_path)
 
     def _uncorrelated(self, parents, new_feature):
@@ -357,19 +360,21 @@ class EvolutionaryFeatureSynthesis:
 
 class EFSRegressor(EvolutionaryFeatureSynthesis):
 
-    def __init__(self, seed, fitness_algorithm, method=None, max_gens=10, num_additions=None, normalize=True,
-                 preserve_originals=True, tournament_probability=.9, max_useless_steps=10, fitness_threshold=.01,
-                 correlation_threshold=0.95, reinit_range_operators=3, splits=3, time_series_cv=False,
-                 range_operators=0, variable_type_indices=None, operators=default_operators, verbose=1):
+    def __init__(self, seed=random.randint(), fitness_algorithm=COEFFICIENT_RANK, method=None, max_gens=10,
+                 num_additions=None, normalize=True, preserve_originals=True, tournament_probability=.9,
+                 max_useless_steps=10, fitness_threshold=.01, correlation_threshold=0.95, reinit_range_operators=3,
+                 splits=3, time_series_cv=False, range_operators=0, variable_type_indices=None,
+                 operators=default_operators, verbose=1):
         super().__init__(EFSRegressor, self).__init__(seed, fitness_algorithm, method=REGRESSION)
 
 
 class EFSClassifier(EvolutionaryFeatureSynthesis):
 
-    def __init__(self, seed, fitness_algorithm, method=None, max_gens=10, num_additions=None, normalize=True,
-                 preserve_originals=True, tournament_probability=.9, max_useless_steps=10, fitness_threshold=.01,
-                 correlation_threshold=0.95, reinit_range_operators=3, splits=3, time_series_cv=False,
-                 range_operators=0, variable_type_indices=None, operators=default_operators, verbose=1):
+    def __init__(self, seed=random.randint(), fitness_algorithm=COEFFICIENT_RANK, method=None, max_gens=10,
+                 num_additions=None, normalize=True, preserve_originals=True, tournament_probability=.9,
+                 max_useless_steps=10, fitness_threshold=.01, correlation_threshold=0.95, reinit_range_operators=3,
+                 splits=3, time_series_cv=False, range_operators=0, variable_type_indices=None,
+                 operators=default_operators, verbose=1):
         super().__init__(EFSRegressor, self).__init__(seed, fitness_algorithm, method=CLASSIFICATION)
 
 

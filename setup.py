@@ -17,7 +17,8 @@ setup(
     keywords='evolution machine learning artificial intelligence',
     install_requires=[
         'numpy',
-        'scikit_learn'
+        'scikit_learn',
+        'scipy'
     ],
     python_requires='>=2.7',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),

@@ -33,7 +33,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y)
 ```
 Finally we'll create and fit the EFSRegressor estimator and check the score.
 ```python
-sr = EFSResgressor()
+sr = EFSRegressor()
 sr.fit(X_train, y_train)
 score = sr.score(X_test, y_test)
 print('Score: ' + score)
