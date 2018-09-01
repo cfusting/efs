@@ -79,8 +79,8 @@ class Operator:
 class OperatorDistribution:
 
     def __init__(self):
-        self.operators_map = None
-        self.weights = None
+        self.operators_map = {}
+        self.weights = []
         self.weights_are_current = False
 
     def add(self, operator):
@@ -88,12 +88,10 @@ class OperatorDistribution:
         self.weights_are_current = False
 
     def get_random(self, k=1):
-        if self.weights_are_current:
-            weights = self.weights
-        else:
-            weights = list(map(lambda x: self.operators_map[x].weight, self.operators_map))
+        if not self.weights_are_current:
+            self.weights = list(map(lambda x: self.operators_map[x].weight, self.operators_map))
             self.weights_are_current = True
-        return random.choices(self.operators_map, weights=weights, k=k)
+        return random.choices(list(self.operators_map.keys()), weights=self.weights, k=k)
 
     def get(self, key):
         return self.operators_map[key]
@@ -108,7 +106,7 @@ ops = [
     Operator(np.subtract, 2, '({0} - {1})', 'sub({0},{1})', 'sub'),
     Operator(np.multiply, 2, '({0} * {1})', 'mul({0},{1})', 'mul'),
     Operator(numpy_protected_div_dividend, 2, '({0} / {1})', 'div({0},{1})', 'div'),
-    Operator(numpy_safe_exp, 1, 'exp({0})', 'exp({0})', 'exp'),
+    #Operator(numpy_safe_exp, 1, 'exp({0})', 'exp({0})', 'exp'),
     Operator(numpy_protected_log_one, 1, 'log({0})', 'log({0})', 'log'),
     Operator(square, 1, 'sqr({0})', 'sqr({0})', 'sqr'),
     Operator(numpy_protected_sqrt, 1, 'sqt({0})', 'sqt({0})', 'sqt'),
@@ -117,4 +115,5 @@ ops = [
     Operator(None, None, None, None, 'mutate'),
     Operator(None, None, None, None, 'transition')
 ]
-map(lambda x: default_operators.add(x), ops)
+for op in ops:
+    default_operators.add(op)
